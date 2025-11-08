@@ -1,4 +1,4 @@
-_Related: [Architecture Overview](../architecture/ArchitectureOverview.md) • [Playout Engine Domain](PlayoutEngineDomain.md) • [Metrics and Timing Contract](../contracts/MetricsAndTimingDomainContract.md) • [Runtime Model](../runtime/PlayoutRuntime.md) • [Development Standards](../developer/DevelopmentStandards.md)_
+_Related: [Architecture Overview](../architecture/ArchitectureOverview.md) • [Playout Engine Domain](PlayoutEngineDomain.md) • [Metrics and Timing Contract](../contracts/MetricsAndTimingContract.md) • [Runtime Model](../runtime/PlayoutRuntime.md) • [Development Standards](../developer/DevelopmentStandards.md)_
 
 # Domain — Metrics and Timing Contract
 
@@ -987,7 +987,7 @@ auto& channel_state = prometheus::BuildGauge()
 ## See Also
 
 - [Playout Engine Domain](PlayoutEngineDomain.md) — Core entities and relationships
-- [Metrics and Timing Contract](../contracts/MetricsAndTimingDomainContract.md) — Testing and validation contract
+- [Metrics and Timing Contract](../contracts/MetricsAndTimingContract.md) — Testing and validation contract
 - [Architecture Overview](../architecture/ArchitectureOverview.md) — System context
 - [Runtime Model](../runtime/PlayoutRuntime.md) — Execution model and threading
 - [Phase 2 Plan](../milestones/Phase2_Plan.md) — Implementation milestones

@@ -1,4 +1,4 @@
-_Related: [Architecture Overview](../architecture/ArchitectureOverview.md) • [Playout Engine Contract](../contracts/PlayoutEngineDomainContract.md) • [Runtime Model](../runtime/PlayoutRuntime.md) • [Phase 2 Goals](../milestones/Phase2_Plan.md)_
+_Related: [Architecture Overview](../architecture/ArchitectureOverview.md) • [Playout Engine Contract](../contracts/PlayoutEngineContract.md) • [Runtime Model](../runtime/PlayoutRuntime.md) • [Phase 2 Goals](../milestones/Phase2_Plan.md)_
 
 # Domain — Playout Engine
 
@@ -821,7 +821,7 @@ max_delay = 32 seconds
 ## See Also
 
 - [Architecture Overview](../architecture/ArchitectureOverview.md) — System context and component integration
-- [Playout Engine Contract](../contracts/PlayoutEngineDomainContract.md) — gRPC control plane contract
+- [Playout Engine Contract](../contracts/PlayoutEngineContract.md) — gRPC control plane contract
 - [Metrics and Timing Domain](MetricsAndTimingDomain.md) — Time synchronization and telemetry
 - [Renderer Domain](RendererDomain.md) — Frame consumption and output
 - [Runtime Model](../runtime/PlayoutRuntime.md) — Execution model and threading details

@@ -1,4 +1,4 @@
-_Related: [Metrics & Timing Domain](../domain/MetricsAndTimingDomain.md) • [Architecture Overview](../architecture/ArchitectureOverview.md) • [Testing Standards](../developer/DevelopmentStandards.md)_
+_Related: [Metrics & Timing Domain](../domain/MetricsAndTimingDomain.md) • [Playout Engine Contract](PlayoutEngineContract.md) • [Architecture Overview](../architecture/ArchitectureOverview.md) • [Testing Standards](../developer/DevelopmentStandards.md)_
 
 # Contract — Metrics and Timing Domain Testing
 
@@ -682,5 +682,6 @@ The Metrics & Timing Domain is considered **validated** when:
 
 - [Metrics & Timing Domain](../domain/MetricsAndTimingDomain.md) — Domain specification and invariants
 - [Development Standards](../developer/DevelopmentStandards.md) — Testing conventions
-- [Playout Engine Domain Contract](PlayoutEngineDomainContract.md) — Related contracts
+- [Playout Engine Contract](PlayoutEngineContract.md) — Related contracts
+- [Renderer Contract](RendererContract.md) — Renderer behavior and testing
 - [Architecture Overview](../architecture/ArchitectureOverview.md) — System context

@@ -46,7 +46,7 @@ Domain documents define **what** the subsystems do, their entities, relationship
 - Performance expectations and scalability
 
 **Related**:
-- [Playout Engine Contract](contracts/PlayoutEngineDomainContract.md)
+- [Playout Engine Contract](contracts/PlayoutEngineContract.md)
 - [Metrics and Timing Domain](domain/MetricsAndTimingDomain.md)
 - [Renderer Domain](domain/RendererDomain.md)
 
@@ -67,7 +67,7 @@ Domain documents define **what** the subsystems do, their entities, relationship
 - Integration with RetroVue runtime
 
 **Related**:
-- [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md)
+- [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md)
 - [Playout Engine Domain](domain/PlayoutEngineDomain.md)
 - [Renderer Domain](domain/RendererDomain.md)
 
@@ -97,7 +97,7 @@ Domain documents define **what** the subsystems do, their entities, relationship
 
 Contract documents define **how** to validate subsystem behavior through testing. They establish mandatory test coverage, validation criteria, performance benchmarks, and CI enforcement rules.
 
-#### ✅ [Playout Engine Contract](contracts/PlayoutEngineDomainContract.md)
+#### ✅ [Playout Engine Contract](contracts/PlayoutEngineContract.md)
 
 **Purpose**: gRPC control-plane contract between RetroVue Python runtime and C++ playout engine.
 
@@ -117,7 +117,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 
 ---
 
-#### 🧪 [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md)
+#### 🧪 [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md)
 
 **Purpose**: Behavioral and testing contract for MasterClock, frame timing, and Prometheus telemetry.
 
@@ -135,7 +135,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 
 **Related**:
 - [Metrics and Timing Domain](domain/MetricsAndTimingDomain.md)
-- [Playout Engine Contract](contracts/PlayoutEngineDomainContract.md)
+- [Playout Engine Contract](contracts/PlayoutEngineContract.md)
 - [Renderer Contract](contracts/RendererContract.md)
 
 ---
@@ -157,7 +157,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 
 **Related**:
 - [Renderer Domain](domain/RendererDomain.md)
-- [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md)
+- [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md)
 - [Testing Contract](contracts/PlayoutEngineTestingContract.md)
 
 ---
@@ -180,9 +180,9 @@ Contract documents define **how** to validate subsystem behavior through testing
 
 **Related**:
 - [Playout Engine Domain](domain/PlayoutEngineDomain.md)
-- [Playout Engine Contract](contracts/PlayoutEngineDomainContract.md)
+- [Playout Engine Contract](contracts/PlayoutEngineContract.md)
 - [Renderer Contract](contracts/RendererContract.md)
-- [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md)
+- [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md)
 
 ---
 
@@ -232,7 +232,7 @@ Contract documents define **how** to validate subsystem behavior through testing
           │   PLAYOUT ENGINE      │
           │      CONTRACT         │
           │ (PlayoutEngine        │
-          │  DomainContract.md)   │
+          │  Contract.md)         │
           │                       │
           │ Validates: gRPC API,  │
           │ Control plane,        │
@@ -271,7 +271,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 1. Start with [Testing Contract](contracts/PlayoutEngineTestingContract.md) for overall strategy
 2. Use subsystem contracts for specific test cases:
    - [Renderer Contract](contracts/RendererContract.md) for renderer tests
-   - [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md) for timing/telemetry tests
+   - [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md) for timing/telemetry tests
 3. Follow verification criteria tables for success metrics
 
 ### For Operators
@@ -283,7 +283,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 
 **Troubleshooting**:
 1. Consult [Playout Engine Domain](domain/PlayoutEngineDomain.md) for error recovery procedures
-2. Check [Playout Engine Contract](contracts/PlayoutEngineDomainContract.md) for control plane behavior
+2. Check [Playout Engine Contract](contracts/PlayoutEngineContract.md) for control plane behavior
 3. Reference state machine diagrams for expected transitions
 
 ### For QA/Test Engineers
@@ -316,9 +316,9 @@ Contract documents define **how** to validate subsystem behavior through testing
 
 **Testing & Validation**:
 - [Testing Contract](contracts/PlayoutEngineTestingContract.md)
-- [Playout Engine Contract](contracts/PlayoutEngineDomainContract.md)
+- [Playout Engine Contract](contracts/PlayoutEngineContract.md)
 - [Renderer Contract](contracts/RendererContract.md)
-- [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md)
+- [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md)
 
 **Milestones & Planning**:
 - [Phase 1 Complete](milestones/Phase1_Complete.md)
@@ -340,8 +340,8 @@ Contract documents define **how** to validate subsystem behavior through testing
 ### Find Information By...
 
 **Subsystem Name**:
-- "Playout Engine" → [Domain](domain/PlayoutEngineDomain.md) | [Contract](contracts/PlayoutEngineDomainContract.md)
-- "Metrics and Timing" → [Domain](domain/MetricsAndTimingDomain.md) | [Contract](contracts/MetricsAndTimingDomainContract.md)
+- "Playout Engine" → [Domain](domain/PlayoutEngineDomain.md) | [Contract](contracts/PlayoutEngineContract.md)
+- "Metrics and Timing" → [Domain](domain/MetricsAndTimingDomain.md) | [Contract](contracts/MetricsAndTimingContract.md)
 - "Renderer" → [Domain](domain/RendererDomain.md) | [Contract](contracts/RendererContract.md)
 
 **Entity Name**:
@@ -353,7 +353,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 **Metric Name**:
 - "retrovue_playout_channel_state" → [Metrics and Timing Domain](domain/MetricsAndTimingDomain.md#core-metrics)
 - "retrovue_playout_buffer_depth_frames" → [Playout Engine Domain](domain/PlayoutEngineDomain.md#5-metrics)
-- "retrovue_playout_frame_gap_seconds" → [Metrics and Timing Contract](contracts/MetricsAndTimingDomainContract.md#fe-002-frame-gap-accuracy)
+- "retrovue_playout_frame_gap_seconds" → [Metrics and Timing Contract](contracts/MetricsAndTimingContract.md#fe-002-frame-gap-accuracy)
 
 **Test ID**:
 - "FE-001" → Search in relevant contract doc (e.g., FE-001 in Renderer Contract)
@@ -368,7 +368,7 @@ Contract documents define **how** to validate subsystem behavior through testing
 ### Naming Conventions
 
 - **Domain files**: `[Subsystem]Domain.md` (e.g., `PlayoutEngineDomain.md`)
-- **Contract files**: `[Subsystem]Contract.md` or `[Subsystem]DomainContract.md` (e.g., `RendererContract.md`)
+- **Contract files**: `[Subsystem]Contract.md` (e.g., `RendererContract.md`, `PlayoutEngineContract.md`)
 - **Location**: Domain files in `/docs/domain/`, contract files in `/docs/contracts/`
 
 ### Link Format
@@ -421,7 +421,7 @@ Status: Enforced | Draft | Deprecated
 ### Quality Metrics
 
 - **Internal Link Integrity**: 100% (all links verified and updated)
-- **Naming Consistency**: 100% (all files follow [Name]Domain.md / [Name]DomainContract.md convention)
+- **Naming Consistency**: 100% (all files follow [Name]Domain.md / [Name]Contract.md convention)
 - **Contract Coverage**: 100% (every domain has a corresponding contract)
 - **Test ID Coverage**: 100% (all test cases have unique IDs and verification criteria)
 

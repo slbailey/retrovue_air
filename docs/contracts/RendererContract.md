@@ -1,4 +1,4 @@
-_Related: [Renderer Domain](../domain/RendererDomain.md) • [Playout Engine Domain](../domain/PlayoutEngineDomain.md) • [Metrics and Timing Contract](MetricsAndTimingDomainContract.md) • [Architecture Overview](../architecture/ArchitectureOverview.md) • [Phase 2 Plan](../milestones/Phase2_Plan.md)_
+_Related: [Renderer Domain](../domain/RendererDomain.md) • [Playout Engine Domain](../domain/PlayoutEngineDomain.md) • [Metrics and Timing Contract](MetricsAndTimingContract.md) • [Architecture Overview](../architecture/ArchitectureOverview.md) • [Phase 2 Plan](../milestones/Phase2_Plan.md)_
 
 # Contract — Renderer Subsystem
 
@@ -1018,7 +1018,7 @@ ctest -R "^Renderer.Integration" -VV
 
 - [Renderer Domain](../domain/RendererDomain.md) — Full renderer domain specification
 - [Playout Engine Domain](../domain/PlayoutEngineDomain.md) — Full playout engine domain model and guarantees
-- [Metrics and Timing Contract](MetricsAndTimingDomainContract.md) — Time synchronization and telemetry contracts
+- [Metrics and Timing Contract](MetricsAndTimingContract.md) — Time synchronization and telemetry contracts
 - [Architecture Overview](../architecture/ArchitectureOverview.md) — System context and component integration
 - [FrameRingBuffer Header](../../include/retrovue/buffer/FrameRingBuffer.h) — Buffer implementation details
 - [Development Standards](../developer/DevelopmentStandards.md) — C++ project structure and conventions
