@@ -107,7 +107,8 @@ Build the frame pipeline infrastructure with lock-free buffer and stub frame gen
 
 **Status:** ✅ Complete  
 **Completed:** Current milestone  
-**Milestone Documents:** [Phase3_Plan.md](Phase3_Plan.md) • [Phase3_FFmpeg.md](Phase3_FFmpeg.md) • [Phase3_Part2_Complete.md](Phase3_Part2_Complete.md)
+**Milestone Document:** [Phase3_Complete.md](Phase3_Complete.md)  
+**Detailed Records:** [Phase3_FFmpeg.md](archive/Phase3_FFmpeg.md) • [Phase3_Part2_Complete.md](archive/Phase3_Part2_Complete.md)
 
 ### Goals
 

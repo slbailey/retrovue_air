@@ -1,6 +1,6 @@
 # ✅ Phase 3 Part 2 – Renderer & HTTP Metrics Complete
 
-_Related: [Phase 3 Plan](Phase3_Plan.md) • [Phase 3 Part 1: FFmpeg](Phase3_FFmpeg.md)_
+_Related: [Phase 3 Plan](../Phase3_Plan.md) • [Phase 3 Part 1: FFmpeg](Phase3_FFmpeg.md)_
 
 ---
 
@@ -320,7 +320,7 @@ src/renderer/FrameRenderer.cpp                     (350 lines)
 include/retrovue/telemetry/MetricsHTTPServer.h     (80 lines)
 src/telemetry/MetricsHTTPServer.cpp                (280 lines)
 scripts/test_metrics.ps1                           (45 lines)
-Phase3_Part2_Complete.md                           (this file)
+archive/Phase3_Part2_Complete.md                   (this file)
 ```
 
 ### Modified Files

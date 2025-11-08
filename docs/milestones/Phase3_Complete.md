@@ -354,10 +354,10 @@ src/renderer/FrameRenderer.cpp                     (350 lines)
 include/retrovue/telemetry/MetricsHTTPServer.h     (80 lines)
 src/telemetry/MetricsHTTPServer.cpp                (280 lines)
 scripts/test_metrics.ps1                           (45 lines)
-docs/milestones/Phase3_Completion.md               (this file)
+docs/milestones/Phase3_Complete.md                 (this file)
 Phase3_Plan.md                                     (54 lines)
-Phase3_FFmpeg.md                                   (390 lines)
-Phase3_Part2_Complete.md                           (417 lines)
+archive/Phase3_FFmpeg.md                           (390 lines)
+archive/Phase3_Part2_Complete.md                   (417 lines)
 ```
 
 ### Modified Files (Phase 3)
