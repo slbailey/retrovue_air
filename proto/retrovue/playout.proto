@@ -1,0 +1,82 @@
+// Repository: Retrovue-playout
+// Component: Playout Engine Control API
+// Purpose: Defines the canonical gRPC contract for managing playout channel lifecycle.
+// Copyright (c) 2025 RetroVue
+// NOTE: This file is the canonical contract between the Python ChannelManager and the C++ playout engine.
+
+syntax = "proto3";
+
+package retrovue.playout;
+
+import "google/protobuf/descriptor.proto";
+
+// Top-level API version constant for compatibility negotiation.
+extend google.protobuf.FileOptions {
+  string PLAYOUT_API_VERSION = 50000;
+}
+
+option (PLAYOUT_API_VERSION) = "1.0.0";
+
+// TODO: Add telemetry streaming RPC once engine exposes metrics.
+// TODO: Introduce status subscription for real-time channel health updates.
+// TODO: Define plan delta messages to minimize payload size during updates.
+
+// PlayoutControl exposes lifecycle management operations for playout channels.
+service PlayoutControl {
+  // StartChannel activates a playout channel with the provided plan on the target port.
+  rpc StartChannel(StartChannelRequest) returns (StartChannelResponse);
+
+  // UpdatePlan swaps the active plan for the given channel without interrupting playback.
+  rpc UpdatePlan(UpdatePlanRequest) returns (UpdatePlanResponse);
+
+  // StopChannel gracefully stops the active playout channel and releases resources.
+  rpc StopChannel(StopChannelRequest) returns (StopChannelResponse);
+
+  // GetVersion returns the API version implemented by the playout engine.
+  rpc GetVersion(ApiVersionRequest) returns (ApiVersion);
+}
+
+// StartChannelRequest provides the context required to initialize a playout channel.
+message StartChannelRequest {
+  int32 channel_id = 1;      // Unique identifier for the target channel.
+  string plan_handle = 2;    // Reference to the schedule plan that should begin playback.
+  int32 port = 3;            // Local UDP/RTP port where the engine should output media.
+}
+
+// StartChannelResponse reports success or failure of the start operation.
+message StartChannelResponse {
+  bool success = 1;          // Indicates whether the channel started successfully.
+  string message = 2;        // Optional diagnostic or error detail.
+}
+
+// UpdatePlanRequest identifies the channel and new plan to activate mid-stream.
+message UpdatePlanRequest {
+  int32 channel_id = 1;      // Target channel currently active on the engine.
+  string plan_handle = 2;    // New plan to swap in for continued playback.
+}
+
+// UpdatePlanResponse indicates the result of applying the new plan.
+message UpdatePlanResponse {
+  bool success = 1;          // True if the plan update was accepted.
+  string message = 2;        // Optional human-readable status message.
+}
+
+// StopChannelRequest identifies which channel to shut down.
+message StopChannelRequest {
+  int32 channel_id = 1;      // Channel identifier corresponding to the running instance.
+}
+
+// StopChannelResponse reports the outcome of the shutdown attempt.
+message StopChannelResponse {
+  bool success = 1;          // True if the channel stopped without error.
+  string message = 2;        // Optional detail about the stop operation.
+}
+
+// ApiVersionRequest is intentionally empty; reserved for future handshake metadata.
+message ApiVersionRequest {}
+
+// ApiVersion communicates the protocol version supported by the engine.
+message ApiVersion {
+  string version = 1;        // Semantic version string of the playout control API.
+}
+
