@@ -10,12 +10,12 @@
 
 ## 🎯 Project Status
 
-| Phase | Status | Description |
-|-------|--------|-------------|
-| **Phase 1** | ✅ Complete | gRPC skeleton + proto definitions |
-| **Phase 2** | ✅ Complete | Frame buffer + stub decode + metrics |
+| Phase       | Status         | Description                                     |
+| ----------- | -------------- | ----------------------------------------------- |
+| **Phase 1** | ✅ Complete    | gRPC skeleton + proto definitions               |
+| **Phase 2** | ✅ Complete    | Frame buffer + stub decode + metrics            |
 | **Phase 3** | 🚧 In Progress | **FFmpeg decoder ✅** + Renderer + HTTP metrics |
-| Phase 4 | 📋 Planned | Production hardening + multi-channel |
+| Phase 4     | 📋 Planned     | Production hardening + multi-channel            |
 
 ### Latest Milestone: FFmpeg Decoder Implementation
 
@@ -81,12 +81,14 @@
 ### Prerequisites
 
 **Required:**
+
 - CMake 3.15+
 - C++20 compiler (MSVC 2019+, GCC 10+, Clang 11+)
 - vcpkg (for dependencies)
 - gRPC + Protobuf (via vcpkg)
 
 **Optional (for real video decoding):**
+
 - FFmpeg development libraries (libavformat, libavcodec, libavutil, libswscale)
 
 ### Build
@@ -114,6 +116,7 @@ python scripts\test_server.py
 ```
 
 **Expected Output:**
+
 ```
 [TEST 1] GetVersion              [PASS]
 [TEST 2] StartChannel            [PASS]
@@ -129,14 +132,14 @@ python scripts\test_server.py
 
 ### Core Modules
 
-| Module | Path | Description |
-|--------|------|-------------|
-| **gRPC Service** | `src/playout_service.*` | PlayoutControl API implementation |
-| **Frame Buffer** | `src/buffer/` | Lock-free circular buffer (60 frames) |
-| **Frame Producer** | `src/decode/FrameProducer.*` | Decode thread orchestrator |
-| **FFmpeg Decoder** | `src/decode/FFmpegDecoder.*` | Real video decoding (Phase 3) |
-| **Metrics** | `src/telemetry/` | Prometheus metrics exporter |
-| **Proto** | `proto/retrovue/` | gRPC service definitions |
+| Module             | Path                         | Description                           |
+| ------------------ | ---------------------------- | ------------------------------------- |
+| **gRPC Service**   | `src/playout_service.*`      | PlayoutControl API implementation     |
+| **Frame Buffer**   | `src/buffer/`                | Lock-free circular buffer (60 frames) |
+| **Frame Producer** | `src/decode/FrameProducer.*` | Decode thread orchestrator            |
+| **FFmpeg Decoder** | `src/decode/FFmpegDecoder.*` | Real video decoding (Phase 3)         |
+| **Metrics**        | `src/telemetry/`             | Prometheus metrics exporter           |
+| **Proto**          | `proto/retrovue/`            | gRPC service definitions              |
 
 ### Header Structure
 
@@ -181,15 +184,15 @@ python scripts\test_server.py
 
 ## 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Project Overview](docs/PROJECT_OVERVIEW.md) | High-level architecture |
-| [Phase 2 Goals](docs/developer/Phase2_Goals.md) | Frame bus integration |
-| [Phase 3 Plan](PHASE3_PLAN.md) | Renderer + metrics roadmap |
-| [Quick Start](docs/developer/QuickStart.md) | Getting started guide |
-| [Build & Debug](docs/developer/BuildAndDebug.md) | Development workflow |
-| [Playout Contract](docs/contracts/PlayoutContract.m) | gRPC API specification |
-| [Development Standards](docs/development-standards.md) | Code structure guidelines |
+| Document                                               | Description                |
+| ------------------------------------------------------ | -------------------------- |
+| [Project Overview](docs/PROJECT_OVERVIEW.md)           | High-level architecture    |
+| [Phase 2 Goals](docs/developer/Phase2_Goals.md)        | Frame bus integration      |
+| [Phase 3 Plan](PHASE3_PLAN.md)                         | Renderer + metrics roadmap |
+| [Quick Start](docs/developer/QuickStart.md)            | Getting started guide      |
+| [Build & Debug](docs/developer/BuildAndDebug.md)       | Development workflow       |
+| [Playout Contract](docs/contracts/PlayoutContract.m)   | gRPC API specification     |
+| [Development Standards](docs/development-standards.md) | Code structure guidelines  |
 
 ### Phase Milestones
 
@@ -209,12 +212,14 @@ The playout engine supports both **stub mode** (synthetic frames) and **real dec
 #### Without FFmpeg (Stub Mode)
 
 Build proceeds normally without FFmpeg:
+
 ```powershell
 cmake -S . -B build
 cmake --build build
 ```
 
 **Behavior:**
+
 - Generates synthetic test frames
 - No external dependencies required
 - Good for development and testing
@@ -224,6 +229,7 @@ cmake --build build
 Install FFmpeg and rebuild:
 
 **Windows (vcpkg):**
+
 ```powershell
 vcpkg install ffmpeg:x64-windows
 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -231,6 +237,7 @@ cmake --build build
 ```
 
 **Linux:**
+
 ```bash
 sudo apt install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
 cmake -S . -B build
@@ -238,6 +245,7 @@ cmake --build build
 ```
 
 **Behavior:**
+
 - Decodes real video files (MP4, MKV, etc.)
 - Supports H.264, HEVC, and other codecs
 - Production-ready performance
