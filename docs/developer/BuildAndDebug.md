@@ -57,7 +57,7 @@ protoc --proto_path=proto --python_out=../Retrovue/src --grpc_python_out=../Retr
 ## Debugging
 
 - Add `--log-level trace` to surface frame-level diagnostics.
-- Use `ffprobe` on `/dev/shm/retrovue-playout-<channel-id>` captures to validate timing metadata.
+- Use `ffprobe` on `/dev/shm/retrovue-air-<channel-id>` captures to validate timing metadata.
 - Inspect Prometheus metrics for frame gap trends before diving into code-level profiling.
 - On Windows, attach Visual Studio to the running process and enable GPU acceleration debugging if hardware decoders are involved.
 

@@ -41,7 +41,7 @@ Describe how the native C++ playout engine fits into the RetroVue architecture a
 
 ## Evolution notes
 
-- API versioning is governed by the `PLAYOUT_API_VERSION` constant. Any breaking change must bump the constant and coordinate releases between `retrovue-core` and `retrovue-playout`.
+- API versioning is governed by the `PLAYOUT_API_VERSION` constant. Any breaking change must bump the constant and coordinate releases between `retrovue-core` and `retrovue-air`.
 - Future extensions (e.g., adaptive bitrate ladders or remote hardware decoders) must maintain the same control plane contract or introduce versioned endpoints.
 
 ## See also

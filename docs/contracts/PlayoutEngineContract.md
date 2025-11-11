@@ -132,7 +132,7 @@ The playout engine **must** expose Prometheus metrics at `/metrics`:
 - API versioning is governed by the `PLAYOUT_API_VERSION` constant in the proto file options.
 - Any **backward-incompatible** change (field removal, name/semantic changes, etc.) **must** bump this version and require synchronized releases of:
   - `retrovue-core`
-  - `retrovue-playout`
+- `retrovue-air`
 
 ---
 

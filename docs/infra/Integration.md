@@ -19,7 +19,7 @@ Document infrastructure requirements, supported deployment models, and operation
 
 ## Process orchestration
 
-- Service name recommendation: `retrovue-playout`.
+- Service name recommendation: `retrovue-air`.
 - Suggested systemd unit snippet:
 
 ```ini
@@ -28,7 +28,7 @@ Description=RetroVue Playout Engine
 After=network.target
 
 [Service]
-ExecStart=/opt/retrovue-playout/bin/retrovue_playout --config /etc/retrovue-playout/config.toml
+ExecStart=/opt/retrovue-air/bin/retrovue_playout --config /etc/retrovue-air/config.toml
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536
@@ -42,7 +42,7 @@ WantedBy=multi-user.target
 ## Networking
 
 - gRPC control plane can operate in-process or via Unix domain socket at `/var/run/retrovue/playout.sock`.
-- Renderer consumes frames through shared memory pipes (`\\.\pipe\retrovue-playout-<channel-id>` on Windows or `/run/retrovue/playout-<channel-id>` on Linux) or TCP sockets where shared memory is unavailable.
+- Renderer consumes frames through shared memory pipes (`\\.\pipe\retrovue-air-<channel-id>` on Windows or `/run/retrovue-air/playout-<channel-id>` on Linux) or TCP sockets where shared memory is unavailable.
 - MPEG-TS output defaults to `http://localhost:<port>/channel/<channel-id>.ts`; ensure reverse proxies pass through chunked transfer encoding.
 
 ## Observability

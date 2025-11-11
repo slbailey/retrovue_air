@@ -614,7 +614,7 @@ retrovue_playout_channel_uptime_seconds{channel="1"} 514.23
 
 - Schema changes require coordinated releases of:
   - `retrovue-core` (Python runtime)
-  - `retrovue-playout` (C++ engine)
+  - `retrovue-air` (C++ engine)
 
 **Validation**:
 

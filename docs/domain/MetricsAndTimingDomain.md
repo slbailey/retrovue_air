@@ -810,7 +810,7 @@ Error collecting metrics: [error message]
 
 ```yaml
 scrape_configs:
-  - job_name: "retrovue-playout"
+  - job_name: "retrovue-air"
     static_configs:
       - targets: ["localhost:9090"]
     scrape_interval: 10s
