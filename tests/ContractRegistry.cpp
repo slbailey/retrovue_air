@@ -1,4 +1,4 @@
-#include "tests/ContractRegistry.h"
+#include "ContractRegistry.h"
 
 #include <algorithm>
 #include <iostream>

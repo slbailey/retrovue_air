@@ -1,6 +1,6 @@
-#include "tests/contracts/ContractRegistryEnvironment.h"
+#include "ContractRegistryEnvironment.h"
 
-#include "tests/ContractRegistry.h"
+#include "../ContractRegistry.h"
 
 #include <gtest/gtest.h>
 

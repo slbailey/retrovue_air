@@ -1,6 +1,7 @@
-#include "tests/BaseContractTest.h"
-#include "tests/contracts/ContractRegistryEnvironment.h"
+#include "../../BaseContractTest.h"
+#include "../ContractRegistryEnvironment.h"
 
+#include <memory>
 #include <thread>
 
 #include "retrovue/buffer/FrameRingBuffer.h"
@@ -55,7 +56,9 @@ namespace
     renderer::RenderConfig config;
     config.mode = renderer::RenderMode::HEADLESS;
 
-    auto renderer = renderer::FrameRenderer::Create(config, buffer);
+    std::shared_ptr<timing::MasterClock> clock;
+    std::shared_ptr<telemetry::MetricsExporter> metrics;
+    auto renderer = renderer::FrameRenderer::Create(config, buffer, clock, metrics, /*channel_id=*/0);
     ASSERT_TRUE(renderer->Start());
 
     std::this_thread::sleep_for(std::chrono::milliseconds(120));
@@ -72,7 +75,9 @@ namespace
     renderer::RenderConfig config;
     config.mode = renderer::RenderMode::HEADLESS;
 
-    auto renderer = renderer::FrameRenderer::Create(config, buffer);
+    std::shared_ptr<timing::MasterClock> clock;
+    std::shared_ptr<telemetry::MetricsExporter> metrics;
+    auto renderer = renderer::FrameRenderer::Create(config, buffer, clock, metrics, /*channel_id=*/0);
     ASSERT_TRUE(renderer->Start());
 
     std::this_thread::sleep_for(std::chrono::milliseconds(80));

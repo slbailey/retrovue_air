@@ -21,6 +21,8 @@ cmake_install.cmake
 *.vcxproj
 *.vcxproj.filters
 *.sln
+Makefile
+compile_commands.json
 
 # Generated files (keep in build/)
 generated/
@@ -34,4 +36,8 @@ __pycache__/
 BUILD_SUCCESS.txt
 *.tmp
 *.log
+
+# CTest artifacts
+Testing/
+CTestTestfile.cmake
 

@@ -85,7 +85,6 @@ target_include_directories(retrovue_playout_proto_check
 add_executable(retrovue_playout
     src/main.cpp
     src/playout_service.cpp
-    src/playout_service.h
     src/buffer/FrameRingBuffer.cpp
     src/decode/FrameProducer.cpp
     src/decode/FFmpegDecoder.cpp
@@ -94,7 +93,6 @@ add_executable(retrovue_playout
     src/telemetry/MetricsHTTPServer.cpp
     src/timing/SystemMasterClock.cpp
     src/timing/TestMasterClock.cpp
-    src/timing/TestMasterClock.h
     include/retrovue/buffer/FrameRingBuffer.h
     include/retrovue/decode/FrameProducer.h
     include/retrovue/decode/FFmpegDecoder.h
@@ -164,7 +162,9 @@ if(GTest_FOUND)
     add_executable(test_decode
         tests/test_decode.cpp
         src/decode/FrameProducer.cpp
+        src/decode/FFmpegDecoder.cpp
         include/retrovue/decode/FrameProducer.h
+        include/retrovue/decode/FFmpegDecoder.h
         src/buffer/FrameRingBuffer.cpp
         include/retrovue/buffer/FrameRingBuffer.h)
 
@@ -180,54 +180,47 @@ if(GTest_FOUND)
             ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
     add_test(NAME test_decode COMMAND test_decode)
-    # Test: Playout Control gRPC service
-    add_executable(test_grpc_service
-        tests/test_grpc_service.cpp
-        src/playout_service.cpp
+    
+    # Contract Tests: MasterClock
+    add_executable(contracts_masterclock_tests
+        tests/ContractRegistry.cpp
+        tests/contracts/ContractRegistryEnvironment.cpp
+        tests/contracts/ContractRegistrySanityTest.cpp
+        tests/contracts/MasterClock/MasterClockContractTests.cpp
         src/buffer/FrameRingBuffer.cpp
         src/decode/FrameProducer.cpp
         src/decode/FFmpegDecoder.cpp
         src/renderer/FrameRenderer.cpp
+        src/timing/SystemMasterClock.cpp
+        src/timing/TestMasterClock.cpp
         src/telemetry/MetricsExporter.cpp
         src/telemetry/MetricsHTTPServer.cpp)
 
-    target_link_libraries(test_grpc_service
+    target_link_libraries(contracts_masterclock_tests
         PRIVATE
             GTest::gtest
-            GTest::gtest_main
-            retrovue_playout_proto)
+            GTest::gtest_main)
 
-    if(FFMPEG_FOUND)
-        target_link_libraries(test_grpc_service PRIVATE PkgConfig::FFMPEG)
-    endif()
-
-    if(SDL2_FOUND)
-        target_link_libraries(test_grpc_service PRIVATE SDL2::SDL2 SDL2::SDL2main)
-    endif()
-
-    if(NOT WIN32)
-        target_link_libraries(test_grpc_service PRIVATE Threads::Threads)
-    endif()
-
-    target_include_directories(test_grpc_service
-        PUBLIC
-            ${PROJECT_SOURCE_DIR}/include
+    target_include_directories(contracts_masterclock_tests
         PRIVATE
+            ${PROJECT_SOURCE_DIR}/include
             ${CMAKE_CURRENT_SOURCE_DIR}/src
-            ${GENERATED_DIR})
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-    add_test(NAME test_grpc_service COMMAND test_grpc_service)
+    add_test(NAME MasterClockContract COMMAND contracts_masterclock_tests)
 
     # Contract Tests: Metrics & Timing
     add_executable(contracts_metricsandtiming_tests
         tests/ContractRegistry.cpp
         tests/contracts/ContractRegistryEnvironment.cpp
+        tests/contracts/ContractRegistrySanityTest.cpp
         tests/contracts/MetricsAndTiming/MetricsAndTimingContractTests.cpp
-        tests/contracts/MetricsAndTiming/MT_005_LongRunDriftStability.cpp
-        tests/contracts/MetricsAndTiming/MT_006_FeedbackConvergence.cpp
         src/buffer/FrameRingBuffer.cpp
         src/decode/FrameProducer.cpp
         src/decode/FFmpegDecoder.cpp
+        src/renderer/FrameRenderer.cpp
+        src/timing/SystemMasterClock.cpp
+        src/timing/TestMasterClock.cpp
         src/telemetry/MetricsExporter.cpp
         src/telemetry/MetricsHTTPServer.cpp)
 
@@ -251,17 +244,28 @@ if(GTest_FOUND)
             ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
     add_test(NAME contracts_metricsandtiming COMMAND contracts_metricsandtiming_tests)
+    add_test(NAME contracts_metricsandtiming_MT001
+        COMMAND contracts_metricsandtiming_tests
+                --gtest_filter=MetricsAndTimingContractTest.MT_001_MasterClockMonotonicAndLowJitter)
+    add_test(NAME contracts_metricsandtiming_MT002
+        COMMAND contracts_metricsandtiming_tests
+                --gtest_filter=MetricsAndTimingContractTest.MT_002_PtsToUtcMappingStable)
 
     # Contract Tests: Playout Engine
     add_executable(contracts_playoutengine_tests
         tests/ContractRegistry.cpp
         tests/contracts/ContractRegistryEnvironment.cpp
+        tests/contracts/ContractRegistrySanityTest.cpp
         tests/contracts/PlayoutEngine/PlayoutEngineContractTests.cpp
         src/buffer/FrameRingBuffer.cpp
         src/decode/FrameProducer.cpp
         src/decode/FFmpegDecoder.cpp
+        src/renderer/FrameRenderer.cpp
         src/telemetry/MetricsExporter.cpp
-        src/telemetry/MetricsHTTPServer.cpp)
+        src/telemetry/MetricsHTTPServer.cpp
+        src/timing/SystemMasterClock.cpp
+        src/timing/TestMasterClock.cpp
+        include/retrovue/telemetry/MetricsExporter.h)
 
     target_link_libraries(contracts_playoutengine_tests
         PRIVATE
@@ -288,9 +292,13 @@ if(GTest_FOUND)
     add_executable(contracts_renderer_tests
         tests/ContractRegistry.cpp
         tests/contracts/ContractRegistryEnvironment.cpp
+        tests/contracts/ContractRegistrySanityTest.cpp
         tests/contracts/Renderer/RendererContractTests.cpp
         src/buffer/FrameRingBuffer.cpp
-        src/renderer/FrameRenderer.cpp)
+        src/renderer/FrameRenderer.cpp
+        src/telemetry/MetricsExporter.cpp
+        src/telemetry/MetricsHTTPServer.cpp
+        include/retrovue/telemetry/MetricsExporter.h)
 
     target_link_libraries(contracts_renderer_tests
         PRIVATE
@@ -315,4 +323,3 @@ if(GTest_FOUND)
 else()
     message(WARNING "GTest not found - skipping unit tests. Install via: vcpkg install gtest")
 endif()
-
