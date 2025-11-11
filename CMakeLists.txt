@@ -223,6 +223,7 @@ if(GTest_FOUND)
         tests/ContractRegistry.cpp
         tests/contracts/ContractRegistryEnvironment.cpp
         tests/contracts/MetricsAndTiming/MetricsAndTimingContractTests.cpp
+        tests/contracts/MetricsAndTiming/MT_005_LongRunDriftStability.cpp
         src/buffer/FrameRingBuffer.cpp
         src/decode/FrameProducer.cpp
         src/decode/FFmpegDecoder.cpp
