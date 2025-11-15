@@ -1,7 +1,8 @@
 #include <iostream>
 
 #include "google/protobuf/descriptor.h"
-#include "retrovue/playout.grpc.pb.h"
+#include "generated/playout.grpc.pb.h"
+#include "generated/playout.pb.h"
 
 int main() {
   const google::protobuf::FileDescriptor* file_descriptor =

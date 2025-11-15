@@ -35,12 +35,15 @@ service PlayoutControl {
   // GetVersion returns the API version implemented by the playout engine.
   rpc GetVersion(ApiVersionRequest) returns (ApiVersion);
 
-  // LoadPreview loads a producer into the preview slot.
-  // The producer is prepared but does not output frames to the renderer.
+  // Phase 9: Dual-producer control
+
+  // LoadPreview loads a new asset into the preview slot for the given channel.
+  // The engine will begin shadow decoding immediately, but will NOT switch live.
   rpc LoadPreview(LoadPreviewRequest) returns (LoadPreviewResponse);
 
-  // SwitchToLive switches the preview slot producer to the live slot.
-  // This stops the current live producer, flushes the renderer, and activates preview as live.
+  // SwitchToLive promotes the current preview slot to the live slot atomically.
+  // Switching must be seamless: PTS continuity is preserved and the playout
+  // sink cannot detect the switch.
   rpc SwitchToLive(SwitchToLiveRequest) returns (SwitchToLiveResponse);
 }
 
@@ -88,28 +91,30 @@ message ApiVersion {
   string version = 1;        // Semantic version string of the playout control API.
 }
 
-// LoadPreviewRequest provides the path and asset ID for loading into preview slot.
+// LoadPreviewRequest identifies the channel and asset to load into the preview slot.
 message LoadPreviewRequest {
-  int32 channel_id = 1;      // Target channel identifier.
-  string path = 2;          // File path to the asset.
-  string asset_id = 3;       // Unique identifier for the asset.
+  int32 channel_id = 1;     // Target channel.
+  string asset_path = 2;    // Fully-qualified media file path.
 }
 
-// LoadPreviewResponse reports success or failure of loading the preview asset.
+// LoadPreviewResponse reports the result of loading the preview asset.
 message LoadPreviewResponse {
-  bool success = 1;          // Indicates whether the preview asset was loaded successfully.
-  string message = 2;        // Optional diagnostic or error detail.
+  bool success = 1;
+  string message = 2;
+  bool shadow_decode_started = 3;  // True if producer entered shadow mode.
 }
 
-// SwitchToLiveRequest identifies the channel and asset to switch to live.
+// SwitchToLiveRequest identifies the channel to switch from preview to live.
 message SwitchToLiveRequest {
-  int32 channel_id = 1;      // Target channel identifier.
-  string asset_id = 2;       // Asset ID that should be switched to live (must match preview slot).
+  int32 channel_id = 1;     // Target channel.
 }
 
 // SwitchToLiveResponse reports the result of the switch operation.
 message SwitchToLiveResponse {
-  bool success = 1;          // True if the switch completed successfully.
-  string message = 2;        // Optional human-readable status message.
+  bool success = 1;
+  string message = 2;
+  // Optional: engine may report continuity details for debugging.
+  bool pts_contiguous = 3;
+  uint64 live_start_pts = 4;
 }
 

@@ -313,7 +313,7 @@ namespace
     EXPECT_NE(metrics.state, telemetry::ChannelState::STOPPED);
     EXPECT_GE(metrics.buffer_depth_frames, 1u);
 
-    manager.StopChannel(runtime, exporter);
+    manager.RequestTeardown(runtime, exporter, "MT_005_graceful_teardown");
     EXPECT_FALSE(exporter.GetChannelMetrics(101, metrics))
         << "Metrics exporter should remove channel after graceful teardown to avoid stale active state";
   }
