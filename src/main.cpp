@@ -13,6 +13,8 @@
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 
 #include "playout_service.h"
+#include "retrovue/runtime/PlayoutEngine.h"
+#include "retrovue/runtime/PlayoutController.h"
 #include "retrovue/telemetry/MetricsExporter.h"
 #include "retrovue/timing/MasterClock.h"
 
@@ -63,8 +65,15 @@ void RunServer(const ServerConfig& config) {
       std::chrono::system_clock::now().time_since_epoch());
   auto master_clock = retrovue::timing::MakeSystemMasterClock(epoch_now.count(), 0.0);
 
-  // Create the service implementation
-  retrovue::playout::PlayoutControlImpl service(metrics_exporter, master_clock);
+  // Create the domain engine (contains tested domain logic)
+  auto engine = std::make_shared<retrovue::runtime::PlayoutEngine>(
+      metrics_exporter, master_clock);
+  
+  // Create the controller (thin adapter between gRPC and domain)
+  auto controller = std::make_shared<retrovue::runtime::PlayoutController>(engine);
+  
+  // Create the gRPC service (thin adapter between gRPC and controller)
+  retrovue::playout::PlayoutControlImpl service(controller);
 
   // Enable health checking and reflection
   grpc::EnableDefaultHealthCheckService(true);

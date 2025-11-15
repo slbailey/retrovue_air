@@ -60,15 +60,24 @@ file(MAKE_DIRECTORY ${GENERATED_DIR})
 set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 
+# Generate files with package namespace (protoc respects package structure)
+set(TEMP_GENERATED_DIR ${GENERATED_DIR}/retrovue)
 set(GENERATED_PROTO_SRCS
-    ${GENERATED_DIR}/retrovue/playout.pb.cc
-    ${GENERATED_DIR}/retrovue/playout.grpc.pb.cc)
+    ${GENERATED_DIR}/playout.pb.cc
+    ${GENERATED_DIR}/playout.grpc.pb.cc)
 set(GENERATED_PROTO_HDRS
-    ${GENERATED_DIR}/retrovue/playout.pb.h
-    ${GENERATED_DIR}/retrovue/playout.grpc.pb.h)
+    ${GENERATED_DIR}/playout.pb.h
+    ${GENERATED_DIR}/playout.grpc.pb.h)
+set(TEMP_GENERATED_PROTO_SRCS
+    ${TEMP_GENERATED_DIR}/playout.pb.cc
+    ${TEMP_GENERATED_DIR}/playout.grpc.pb.cc)
+set(TEMP_GENERATED_PROTO_HDRS
+    ${TEMP_GENERATED_DIR}/playout.pb.h
+    ${TEMP_GENERATED_DIR}/playout.grpc.pb.h)
 
+# Generate to temp location first (with package namespace)
 add_custom_command(
-    OUTPUT ${GENERATED_PROTO_SRCS} ${GENERATED_PROTO_HDRS}
+    OUTPUT ${TEMP_GENERATED_PROTO_SRCS} ${TEMP_GENERATED_PROTO_HDRS}
     COMMAND ${_PROTOBUF_PROTOC}
             --grpc_out ${GENERATED_DIR}
             --cpp_out ${GENERATED_DIR}
@@ -78,6 +87,21 @@ add_custom_command(
             ${PROTO_FILE}
     DEPENDS ${PROTO_FILE}
     COMMENT "Generating gRPC sources from ${PROTO_FILE}"
+    VERBATIM)
+
+# Copy generated files to flat structure (generated/playout.*.pb.h)
+add_custom_command(
+    OUTPUT ${GENERATED_PROTO_SRCS} ${GENERATED_PROTO_HDRS}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${TEMP_GENERATED_DIR}/playout.pb.cc ${GENERATED_DIR}/playout.pb.cc
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${TEMP_GENERATED_DIR}/playout.grpc.pb.cc ${GENERATED_DIR}/playout.grpc.pb.cc
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${TEMP_GENERATED_DIR}/playout.pb.h ${GENERATED_DIR}/playout.pb.h
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${TEMP_GENERATED_DIR}/playout.grpc.pb.h ${GENERATED_DIR}/playout.grpc.pb.h
+    DEPENDS ${TEMP_GENERATED_PROTO_SRCS} ${TEMP_GENERATED_PROTO_HDRS}
+    COMMENT "Copying generated proto files to flat structure"
     VERBATIM)
 
 set_source_files_properties(${GENERATED_PROTO_SRCS} ${GENERATED_PROTO_HDRS}
@@ -118,6 +142,8 @@ add_executable(retrovue_air
     src/renderer/FrameRenderer.cpp
     src/runtime/OrchestrationLoop.cpp
     src/runtime/PlayoutControlStateMachine.cpp
+    src/runtime/PlayoutController.cpp
+    src/runtime/PlayoutEngine.cpp
     src/telemetry/MetricsExporter.cpp
     src/telemetry/MetricsHTTPServer.cpp
     src/timing/SystemMasterClock.cpp
@@ -134,6 +160,9 @@ add_executable(retrovue_air
 target_link_libraries(retrovue_air
     PRIVATE 
         retrovue_air_proto)
+
+# Ensure proto is built before retrovue_air
+add_dependencies(retrovue_air retrovue_air_proto)
 
 target_compile_definitions(retrovue_air
     PRIVATE
@@ -165,9 +194,9 @@ endif()
 target_include_directories(retrovue_air
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
+        ${GENERATED_DIR}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${GENERATED_DIR})
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Unit tests (optional - requires GTest via vcpkg)
 if(GTest_FOUND)

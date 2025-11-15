@@ -34,6 +34,17 @@ service PlayoutControl {
 
   // GetVersion returns the API version implemented by the playout engine.
   rpc GetVersion(ApiVersionRequest) returns (ApiVersion);
+
+  // Phase 9: Dual-producer control
+
+  // LoadPreview loads a new asset into the preview slot for the given channel.
+  // The engine will begin shadow decoding immediately, but will NOT switch live.
+  rpc LoadPreview(LoadPreviewRequest) returns (LoadPreviewResponse);
+
+  // SwitchToLive promotes the current preview slot to the live slot atomically.
+  // Switching must be seamless: PTS continuity is preserved and the playout
+  // sink cannot detect the switch.
+  rpc SwitchToLive(SwitchToLiveRequest) returns (SwitchToLiveResponse);
 }
 
 // StartChannelRequest provides the context required to initialize a playout channel.
@@ -78,5 +89,32 @@ message ApiVersionRequest {}
 // ApiVersion communicates the protocol version supported by the engine.
 message ApiVersion {
   string version = 1;        // Semantic version string of the playout control API.
+}
+
+// LoadPreviewRequest identifies the channel and asset to load into the preview slot.
+message LoadPreviewRequest {
+  int32 channel_id = 1;     // Target channel.
+  string asset_path = 2;    // Fully-qualified media file path.
+}
+
+// LoadPreviewResponse reports the result of loading the preview asset.
+message LoadPreviewResponse {
+  bool success = 1;
+  string message = 2;
+  bool shadow_decode_started = 3;  // True if producer entered shadow mode.
+}
+
+// SwitchToLiveRequest identifies the channel to switch from preview to live.
+message SwitchToLiveRequest {
+  int32 channel_id = 1;     // Target channel.
+}
+
+// SwitchToLiveResponse reports the result of the switch operation.
+message SwitchToLiveResponse {
+  bool success = 1;
+  string message = 2;
+  // Optional: engine may report continuity details for debugging.
+  bool pts_contiguous = 3;
+  uint64 live_start_pts = 4;
 }
 
