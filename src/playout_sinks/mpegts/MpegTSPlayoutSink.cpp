@@ -52,6 +52,10 @@ MpegTSPlayoutSink::MpegTSPlayoutSink(
       network_errors_(0),
       buffer_underruns_(0),
       late_frame_drops_(0) {
+  // Create UDS sink if socket path is configured
+  if (!config_.ts_socket_path.empty()) {
+    ts_output_sink_ = std::make_unique<TsOutputSink>(config_.ts_socket_path);
+  }
 }
 
 MpegTSPlayoutSink::MpegTSPlayoutSink(
@@ -77,6 +81,10 @@ MpegTSPlayoutSink::MpegTSPlayoutSink(
       network_errors_(0),
       buffer_underruns_(0),
       late_frame_drops_(0) {
+  // Create UDS sink if socket path is configured
+  if (!config_.ts_socket_path.empty()) {
+    ts_output_sink_ = std::make_unique<TsOutputSink>(config_.ts_socket_path);
+  }
 }
 
 MpegTSPlayoutSink::~MpegTSPlayoutSink() {
@@ -94,10 +102,29 @@ bool MpegTSPlayoutSink::start() {
     return false;  // Can only start from Idle state
   }
 
-  // Initialize TCP socket (create, bind, listen)
-  if (!initializeSocket()) {
-    internal_state_ = InternalState::Error;
-    return false;
+  // Initialize socket (TCP or UDS depending on config)
+  if (!config_.ts_socket_path.empty()) {
+    // UDS mode: initialize Unix domain socket sink
+    if (!ts_output_sink_) {
+      ts_output_sink_ = std::make_unique<TsOutputSink>(config_.ts_socket_path);
+    }
+    if (!ts_output_sink_->Initialize()) {
+      std::cerr << "[MpegTSPlayoutSink] Failed to initialize UDS sink" << std::endl;
+      internal_state_ = InternalState::Error;
+      return false;
+    }
+    if (!ts_output_sink_->Start()) {
+      std::cerr << "[MpegTSPlayoutSink] Failed to start UDS sink" << std::endl;
+      internal_state_ = InternalState::Error;
+      return false;
+    }
+    std::cout << "[MpegTSPlayoutSink] UDS sink started on: " << config_.ts_socket_path << std::endl;
+  } else {
+    // TCP mode: initialize TCP socket (create, bind, listen)
+    if (!initializeSocket()) {
+      internal_state_ = InternalState::Error;
+      return false;
+    }
   }
 
   internal_state_ = InternalState::WaitingForClient;
@@ -108,10 +135,16 @@ bool MpegTSPlayoutSink::start() {
   
   std::cout << "[MpegTSPlayoutSink] Started | PTS mapping will be initialized on first frame" << std::endl;
 
-  // Start accept thread (non-blocking accept loop)
-  stop_requested_.store(false, std::memory_order_release);
-  running_.store(true, std::memory_order_release);
-  accept_thread_ = std::thread(&MpegTSPlayoutSink::acceptThread, this);
+  // Start accept thread (non-blocking accept loop) - only for TCP mode
+  if (config_.ts_socket_path.empty()) {
+    stop_requested_.store(false, std::memory_order_release);
+    running_.store(true, std::memory_order_release);
+    accept_thread_ = std::thread(&MpegTSPlayoutSink::acceptThread, this);
+  } else {
+    // UDS mode: accept is handled by TsOutputSink
+    stop_requested_.store(false, std::memory_order_release);
+    running_.store(true, std::memory_order_release);
+  }
 
   // Note: Encoder pipeline is initialized when client connects
 
@@ -185,8 +218,13 @@ void MpegTSPlayoutSink::stop() {
     }
   }
 
-  // Cleanup socket
-  cleanupSocket();
+  // Cleanup socket (TCP or UDS)
+  if (ts_output_sink_) {
+    ts_output_sink_->Stop();
+    ts_output_sink_.reset();
+  } else {
+    cleanupSocket();
+  }
 
   running_.store(false, std::memory_order_release);
   internal_state_ = InternalState::Stopped;
@@ -238,7 +276,28 @@ void MpegTSPlayoutSink::workerLoop() {
     const int64_t now_us = master_clock_->now_utc_us();
 
     // Try to accept new client connection (non-blocking)
-    tryAcceptClient();
+    // For UDS mode, the accept is handled by TsOutputSink
+    if (!config_.ts_socket_path.empty()) {
+      // UDS mode: check if client is connected
+      if (ts_output_sink_ && ts_output_sink_->IsClientConnected()) {
+        if (!client_connected_.load(std::memory_order_acquire)) {
+          client_connected_.store(true, std::memory_order_release);
+          // Initialize encoder for new client
+          if (!initializeEncoderForClient()) {
+            std::cerr << "[MpegTSPlayoutSink] Failed to initialize encoder for UDS client" << std::endl;
+            client_connected_.store(false, std::memory_order_release);
+          }
+        }
+      } else {
+        // Client disconnected
+        if (client_connected_.load(std::memory_order_acquire)) {
+          handleClientDisconnect();
+        }
+      }
+    } else {
+      // TCP mode: try to accept client
+      tryAcceptClient();
+    }
 
     // Try to drain output queue first (send pending packets)
     drainOutputQueue();
@@ -544,6 +603,11 @@ void MpegTSPlayoutSink::cleanupSocket() {
 }
 
 void MpegTSPlayoutSink::acceptThread() {
+  // UDS mode: accept thread is handled by TsOutputSink
+  if (!config_.ts_socket_path.empty()) {
+    return;  // Not needed for UDS mode
+  }
+  
   while (running_.load(std::memory_order_acquire) &&
          !stop_requested_.load(std::memory_order_acquire)) {
     tryAcceptClient();
@@ -570,6 +634,11 @@ void MpegTSPlayoutSink::acceptThread() {
 }
 
 bool MpegTSPlayoutSink::tryAcceptClient() {
+  // UDS mode: accept is handled by TsOutputSink
+  if (!config_.ts_socket_path.empty()) {
+    return false;  // Not applicable for UDS mode
+  }
+  
   // If already connected, don't accept another
   if (client_connected_.load(std::memory_order_acquire)) {
     return false;
@@ -713,6 +782,22 @@ bool MpegTSPlayoutSink::sendToSocket(const uint8_t* data, size_t size) {
 // Socket is in blocking mode, so send() will block until all bytes are written
 // No EAGAIN can occur, no retries needed, no sleeps needed
 int MpegTSPlayoutSink::writeAllBlocking(uint8_t* buf, int buf_size) {
+  // Use UDS sink if configured, otherwise use TCP socket
+  if (!config_.ts_socket_path.empty() && ts_output_sink_) {
+    if (!ts_output_sink_->IsClientConnected()) {
+      return -1;  // No client connected
+    }
+    
+    // Write to UDS sink (blocking write)
+    if (ts_output_sink_->Write(buf, static_cast<size_t>(buf_size))) {
+      return buf_size;  // All bytes written
+    } else {
+      // Write failed - client may have disconnected
+      return -1;
+    }
+  }
+  
+  // TCP mode: use existing TCP socket logic
   if (!client_connected_.load(std::memory_order_acquire)) {
     return -1;  // No client - fail immediately
   }

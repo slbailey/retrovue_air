@@ -75,6 +75,18 @@ namespace retrovue
       std::cout << "[PlayoutControlImpl] Service initialized (API version: " << kApiVersion
                 << ", drift ppm: "
                 << (master_clock_ ? master_clock_->drift_ppm() : 0.0) << ")" << std::endl;
+      
+      // Check for TS socket path template from environment variable
+      const char* ts_socket_env = std::getenv("AIR_TS_SOCKET_PATH");
+      if (ts_socket_env && std::strlen(ts_socket_env) > 0) {
+        SetTsSocketPathTemplate(ts_socket_env);
+      }
+    }
+
+    void PlayoutControlImpl::SetTsSocketPathTemplate(const std::string& template_path) {
+      std::lock_guard<std::mutex> lock(ts_socket_template_mutex_);
+      ts_socket_path_template_ = template_path;
+      std::cout << "[PlayoutControlImpl] TS socket path template set: " << template_path << std::endl;
     }
 
     PlayoutControlImpl::~PlayoutControlImpl()
@@ -129,8 +141,24 @@ namespace retrovue
       const std::string &plan_handle = request->plan_handle();
       const int32_t port = request->port();
 
+      // Derive UDS socket path from template if configured
+      std::string ts_socket_path;
+      {
+        std::lock_guard<std::mutex> lock(ts_socket_template_mutex_);
+        if (!ts_socket_path_template_.empty()) {
+          // Replace %d with channel_id
+          char path_buf[256];
+          std::snprintf(path_buf, sizeof(path_buf), ts_socket_path_template_.c_str(), channel_id);
+          ts_socket_path = path_buf;
+        }
+      }
+
       std::cout << "[StartChannel] Request received: channel_id=" << channel_id
-                << ", plan_handle=" << plan_handle << ", port=" << port << std::endl;
+                << ", plan_handle=" << plan_handle << ", port=" << port;
+      if (!ts_socket_path.empty()) {
+        std::cout << ", ts_socket_path=" << ts_socket_path;
+      }
+      std::cout << std::endl;
 
       // Check if channel is already active
       if (active_channels_.find(channel_id) != active_channels_.end())
@@ -143,6 +171,7 @@ namespace retrovue
 
       // Create channel worker
       auto worker = std::make_unique<ChannelWorker>(channel_id, plan_handle, port);
+      worker->ts_socket_path = ts_socket_path;  // Store per-channel socket path
 
       // Initialize ring buffer
       worker->ring_buffer = std::make_unique<buffer::FrameRingBuffer>(kDefaultBufferSize);

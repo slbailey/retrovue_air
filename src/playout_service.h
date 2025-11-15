@@ -40,6 +40,7 @@ struct ChannelWorker {
   std::unique_ptr<renderer::FrameRenderer> renderer;
   std::unique_ptr<runtime::OrchestrationLoop> orchestration_loop;
   std::unique_ptr<runtime::PlayoutControlStateMachine> control;
+  std::string ts_socket_path;  // Per-channel UDS socket path (if configured)
   std::shared_ptr<std::atomic<bool>> underrun_active;
   std::shared_ptr<std::atomic<bool>> overrun_active;
   std::atomic<bool> teardown_requested{false};
@@ -93,6 +94,12 @@ class PlayoutControlImpl final : public PlayoutControl::Service {
 
   void RequestTeardown(int32_t channel_id, const std::string& reason);
 
+  // Set the Unix domain socket path template for TS output.
+  // Template should contain %d for channel_id substitution.
+  // Example: "/var/run/retrovue/air/channel_%d.sock"
+  // If empty, TS output will use TCP (existing behavior).
+  void SetTsSocketPathTemplate(const std::string& template_path);
+
  private:
   // Updates metrics for a channel based on current state.
   void UpdateChannelMetrics(int32_t channel_id);
@@ -110,6 +117,12 @@ class PlayoutControlImpl final : public PlayoutControl::Service {
   // Metrics exporter (shared across all channels)
   std::shared_ptr<telemetry::MetricsExporter> metrics_exporter_;
   std::shared_ptr<timing::MasterClock> master_clock_;
+  
+  // Unix domain socket path template for TS output (optional)
+  // If set, TS output will use UDS instead of TCP
+  // Template should contain %d for channel_id (e.g., "/var/run/retrovue/air/channel_%d.sock")
+  std::string ts_socket_path_template_;
+  std::mutex ts_socket_template_mutex_;
   
   // Active channel workers
   std::mutex channels_mutex_;

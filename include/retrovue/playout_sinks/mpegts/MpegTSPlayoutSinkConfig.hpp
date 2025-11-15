@@ -20,8 +20,9 @@ enum class UnderflowPolicy {
 // Configuration for MpegTSPlayoutSink
 // POD struct - immutable after construction
 struct MpegTSPlayoutSinkConfig {
-  int port = 9000;                    // TCP server port
+  int port = 9000;                    // TCP server port (used if ts_socket_path is empty)
   std::string bind_host = "127.0.0.1"; // TCP bind address (default: localhost)
+  std::string ts_socket_path;         // Unix domain socket path for TS output (if empty, use TCP)
   double target_fps = 30.0;           // Target frame rate
   int bitrate = 5000000;              // Encoding bitrate (5 Mbps)
   int gop_size = 30;                  // GOP size (1 second at 30fps)

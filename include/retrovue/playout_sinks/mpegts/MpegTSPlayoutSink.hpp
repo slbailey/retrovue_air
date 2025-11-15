@@ -8,6 +8,7 @@
 
 #include "retrovue/playout_sinks/IPlayoutSink.h"
 #include "retrovue/playout_sinks/mpegts/MpegTSPlayoutSinkConfig.hpp"
+#include "retrovue/playout_sinks/mpegts/TsOutputSink.h"
 #include "retrovue/buffer/FrameRingBuffer.h"
 #include "retrovue/timing/MasterClock.h"
 
@@ -186,10 +187,13 @@ class MpegTSPlayoutSink : public IPlayoutSink {
   std::thread worker_thread_;
   std::thread accept_thread_;  // Optional: for accepting TCP clients
 
-  // TCP socket
+  // TCP socket (used when ts_socket_path is empty)
   int listen_fd_;
   int client_fd_;
   std::atomic<bool> client_connected_;
+  
+  // Unix Domain Socket sink (used when ts_socket_path is set)
+  std::unique_ptr<TsOutputSink> ts_output_sink_;
 
   // Subsystems
   std::unique_ptr<PTSController> pts_controller_;
